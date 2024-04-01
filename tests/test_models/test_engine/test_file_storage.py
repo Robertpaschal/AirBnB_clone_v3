@@ -113,3 +113,73 @@ class TestFileStorage(unittest.TestCase):
         with open("file.json", "r") as f:
             js = f.read()
         self.assertEqual(json.loads(string), json.loads(js))
+
+    @unittest.skipIf(models.storage_t == 'db', "not testing file storage")
+    def test_get(self):
+        """Test the get method of FileStorage"""
+        # Create an instance of FileStorage
+        storage = FileStorage()
+        # Create an instance of a class to be added to the storage
+        obj = State(name="California")
+        # Add the object to the storage
+        storage.new(obj)
+        # Save changes to the storage
+        storage.save()
+        # Retrieve the object from the storage using get method
+        retrieved_obj = storage.get(State, obj.id)
+        # Check if the retrieved object is the same as the original object
+        self.assertEqual(retrieved_obj, obj)
+
+    @unittest.skipIf(models.storage_t == 'db', "not testing file storage")
+    def test_get_non_existing(self):
+        """Test the get method with a non-existing object"""
+        # Create an instance of FileStorage
+        storage = FileStorage()
+        # Retrieve a non-existing object from the storage
+        retrieved_obj = storage.get(State, "non_existing_id")
+        # Check if retrieved_obj is None
+        self.assertIsNone(retrieved_obj)
+
+    @unittest.skipIf(models.storage_t == 'db', "not testing file storage")
+    def test_count_all(self):
+        """Test the count method without passing a class"""
+        # Create an instance of FileStorage
+        storage = FileStorage()
+        # Add some objects to the storage
+        storage.new(State(name="California"))
+        storage.new(State(name="New York"))
+        storage.new(City(state_id="state_id", name="Los Angeles"))
+        storage.new(User(email="test@example.com", password="password"))
+        storage.new(Place(city_id="city_id", user_id="user_id", name="Place"))
+        storage.save()
+        # Count all objects in the storage
+        count = storage.count()
+        # Check if the count is correct
+        self.assertEqual(count, 5)
+
+    @unittest.skipIf(models.storage_t == 'db', "not testing file storage")
+    def test_count_by_class(self):
+        """Test the count method by passing a class"""
+        # Create an instance of FileStorage
+        storage = FileStorage()
+        # Add some objects to the storage
+        storage.new(State(name="California"))
+        storage.new(State(name="New York"))
+        storage.new(City(state_id="state_id", name="Los Angeles"))
+        storage.new(User(email="test@example.com", password="password"))
+        storage.new(Place(city_id="city_id", user_id="user_id", name="Place"))
+        storage.save()
+        # Count objects of State class in the storage
+        state_count = storage.count(State)
+        # Check if the count is correct
+        self.assertEqual(state_count, 2)
+
+        # Count objects of City class in the storage
+        city_count = storage.count(City)
+        # Check if the count is correct
+        self.assertEqual(city_count, 1)
+
+        # Count objects of User class in the storage
+        user_count = storage.count(User)
+        # Check if the count is correct
+        self.assertEqual(user_count, 1)
