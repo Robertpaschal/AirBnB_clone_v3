@@ -85,10 +85,12 @@ class TestBaseModel(unittest.TestCase):
         and that upon creation have identical updated_at and created_at
         value."""
         mock_now = datetime(2022, 1, 1, 0, 0, 0)
-        mock_datetime.now.side_effect = [
-            mock_now, mock_now + timedelta(seconds=0.1)]
+        mock_datetime.now.return_value = mock_now
 
         inst1 = BaseModel()
+
+        mock_datetime.now.return_value = mock_now + timedelta(seconds=0.1)
+
         inst2 = BaseModel()
 
         self.assertLessEqual(inst1.created_at, inst2.created_at)
@@ -96,7 +98,7 @@ class TestBaseModel(unittest.TestCase):
         self.assertEqual(inst2.created_at, inst2.updated_at)
         self.assertNotEqual(inst1.created_at, inst2.created_at)
         self.assertNotEqual(inst1.updated_at, inst2.updated_at)
-
+    
     def test_uuid(self):
         """Test that id is a valid uuid"""
         inst1 = BaseModel()
