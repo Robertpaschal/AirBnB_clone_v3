@@ -79,7 +79,7 @@ class TestBaseModel(unittest.TestCase):
         self.assertEqual(inst.name, "Holberton")
         self.assertEqual(inst.number, 89)
 
-    def test_datetime_attributes(self,):
+    def test_datetime_attributes(self):
         """Test that two BaseModel instances have different datetime objects
         and that upon creation have identical updated_at and created_at
         value."""
