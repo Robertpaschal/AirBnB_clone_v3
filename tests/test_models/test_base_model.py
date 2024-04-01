@@ -1,12 +1,13 @@
 #!/usr/bin/python3
 """Test BaseModel for expected behavior and documentation"""
-from datetime import datetime
+from datetime import datetime, timedelta
 import inspect
 import models
 import pep8 as pycodestyle
 import time
 import unittest
 from unittest import mock
+from unittest.mock import patch
 BaseModel = models.base_model.BaseModel
 module_doc = models.base_model.__doc__
 
@@ -78,19 +79,19 @@ class TestBaseModel(unittest.TestCase):
         self.assertEqual(inst.name, "Holberton")
         self.assertEqual(inst.number, 89)
 
-    def test_datetime_attributes(self):
+    @patch('models.base_model.datetime')
+    def test_datetime_attributes(self, mock_datetime):
         """Test that two BaseModel instances have different datetime objects
         and that upon creation have identical updated_at and created_at
         value."""
-        tic = datetime.now()
+        mock_now = datetime(2022, 1, 1, 0, 0, 0)
+        mock_datetime.now.side_effect = [
+            mock_now, mock_now + timedelta(seconds=0.1)]
+
         inst1 = BaseModel()
-        toc = datetime.now()
-        self.assertTrue(tic <= inst1.created_at <= toc)
-        time.sleep(1e-4)
-        tic = datetime.now()
         inst2 = BaseModel()
-        toc = datetime.now()
-        self.assertTrue(tic <= inst2.created_at <= toc)
+
+        self.assertLessEqual(inst1.created_at, inst2.created_at)
         self.assertEqual(inst1.created_at, inst1.updated_at)
         self.assertEqual(inst2.created_at, inst2.updated_at)
         self.assertNotEqual(inst1.created_at, inst2.created_at)
