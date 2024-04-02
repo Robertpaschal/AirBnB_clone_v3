@@ -32,4 +32,4 @@ class User(BaseModel, Base):
             self.password = hashlib.md5(
                 kwargs['password'].encode()).hexdigest()
         elif not hasattr(self, 'password'):
-            self.password = hashlib.md5().hexdigest()
+            self.password = None
